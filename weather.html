@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="weather_stylesheet.css">
+    <title>Weather-Widget</title>
+</head>
+<body>
+    <div class="weather" id="weatherWidget">
+        <div class="weather-loc"></div>
+        <div class="weather-humidity"></div>
+        <div class="weather-temp"></div>
+        <img class="weather-tomorrow" src="n" alt =""/>
+        <img class="weather-dayaftertomorrow" src="n" alt =""/>
+    </div>
+    <p>
+        <input type="button" id="update" value="Update">
+    </p>
+    <script>
+        let responseG = '';
+        function fetchWeather(){
+            const pathToPhpFile = 'https://classes.engineering.wustl.edu/cse330/content/weather_json.php';
+            const data = { x: 'hi', y: 'hello' };
+            fetch(pathToPhpFile, {
+                method: "POST",
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(response => {
+                console.log('Success:', JSON.stringify(response));
+                responseG = response;
+                tellWeather(responseG);
+                
+            })
+            .catch(error => console.error('Error:',error))
+        } 
+        document.addEventListener("DOMContentLoaded", fetchWeather, false);
+        document.getElementById("update").addEventListener("click", fetchWeather, false);
+        function tellWeather(responseG){
+            document.getElementById("weatherWidget").children[0].innerHTML = "<strong>" + responseG.location.city + "</strong>	" + responseG.location.state; 
+            document.getElementById("weatherWidget").children[1].innerHTML = responseG.atmosphere.humidity; 
+            document.getElementById("weatherWidget").children[2].innerHTML = responseG.current.temp; 
+            document.getElementById("weatherWidget").children[3].src = "http://us.yimg.com/i/us/nws/weather/gr/"+ responseG.tomorrow.code +"ds.png"; 
+            document.getElementById("weatherWidget").children[4].src = "http://us.yimg.com/i/us/nws/weather/gr/"+ responseG.dayafter.code +"ds.png"; 
+            document.getElementById("weatherWidget").children[3].alt = responseG.tomorrow.text;
+            document.getElementById("weatherWidget").children[4].alt = responseG.dayafter.text; 
+        }
+    </script>
+</body>
+</html>
